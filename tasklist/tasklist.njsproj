@@ -30,20 +30,28 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="docs\interfaces.md" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\processes\" />
+    <Folder Include="docs\" />
+    <Folder Include="src\classes\" />
+    <Folder Include="src\utils\" />
+    <Folder Include="src\handlers\" />
     <Folder Include="src\test\" />
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\classes\inlineProcess.ts" />
+    <TypeScriptCompile Include="src\handlers\createInlineProcess.ts" />
     <TypeScriptCompile Include="src\index.ts" />
-    <TypeScriptCompile Include="src\processes\getAllProcesses.ts" />
-    <TypeScriptCompile Include="src\processes\killProcess.ts" />
-    <TypeScriptCompile Include="src\test\app.ts" />
+    <TypeScriptCompile Include="src\handlers\getAllProcesses.ts" />
+    <TypeScriptCompile Include="src\handlers\killProcess.ts" />
+    <TypeScriptCompile Include="src\test\test-create_process.ts" />
+    <TypeScriptCompile Include="src\test\test-filter_processes.ts" />
+    <TypeScriptCompile Include="src\test\test-get_processes.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <ProjectExtensions>

@@ -365,3 +365,7 @@ FodyWeavers.xsd
 /dist
 /tasklist/dist
 ./dist
+/tasklist/better-tasklist-0.1.2.tgz
+/tasklist/better-tasklist-0.8.3.tgz
+/tasklist/better-tasklist-0.8.4.tgz
+/tasklist/tasklist-0.0.0.tgz

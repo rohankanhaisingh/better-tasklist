@@ -135,7 +135,7 @@ async function parseOutputContent(input: string, options: ProcessesFetchOptions)
 
 	const tasklistHeaders = getTasklistHeaders(options.verbose ? "verbose" : "default");
 
-	const parser: Parser = parse({ columns: tasklistHeaders});
+	const parser: Parser = parse({ columns: tasklistHeaders, skipRecordsWithError: true});
 
 	const data: FetchedProcess[] = [];
 
@@ -233,7 +233,7 @@ export function _filterFetchedProcesses(fetchedProcesses: IEnumeratedProcesses, 
 		if (filterObjectByPID(p, (typeof filter.pid === "string" || typeof filter.pid === "number") ? filter.pid : null)) filteredProcesses.push(p);
 		if (filterObjectBySessionName(p, typeof filter.sessionName === "string" ? filter.sessionName : null)) filteredProcesses.push(p);
 	}
-	 
+
 	return filteredProcesses;
 }
 /**

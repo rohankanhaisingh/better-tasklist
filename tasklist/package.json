@@ -1,18 +1,39 @@
 {
-  "name": "tasklist",
-  "version": "0.0.0",
-  "description": "tasklist",
-  "main": "app.js",
+  "name": "better-tasklist",
+  "version": "1.0.1",
+  "license": "MIT",
+  "repository": "https://github.com/babahgee/better-tasklist",
+  "description": "A new wrapper for the Windows `tasklist` command. Gives developers the ability to control running tasks.",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "type": "commonjs",
   "author": {
-    "name": ""
+    "name": "Babah Gee",
+    "email": "tr.kanhaisingh@gmail.com",
+    "url": "https://github.com/babahgee/"
   },
+  "keywords": [
+    "tasklist",
+    "better-tasklist",
+    "windows",
+    "win32",
+    "services",
+    "processes",
+    "taskmanager"
+  ],
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
-    "start": "npm run build && node ./dist/test/app.js"
+    "start": "npm run build"
   },
   "devDependencies": {
     "@types/node": "^14.14.7",
+    "csv": "^6.2.0",
+    "csv-parser": "^3.0.0",
     "typescript": "^4.0.5"
+  },
+  "dependencies": {
+    "@types/colors": "^1.2.1",
+    "colors": "^1.4.0"
   }
 }

@@ -5,9 +5,9 @@
  *	Inspired by the original NPM package named 'tasklist'.
 */
 
-import { _fetchProcesses, _filterFetchedProcesses } from "./processes/getAllProcesses";
-import { _killProcessByPID } from "./processes/killProcess";
-
+import { _fetchProcesses, _filterFetchedProcesses } from "./handlers/getAllProcesses";
+import { _killProcessByPID } from "./handlers/killProcess";
+import { _create_inline_process } from "./handlers/createInlineProcess"
 
 // ============== Main default namespace ==============
 namespace tasklist {
@@ -16,10 +16,16 @@ namespace tasklist {
 	export const filterFetchedProcesses = _filterFetchedProcesses;
 
 	export const killProcessByPID = _killProcessByPID;
+
+	export const createInlineProcess = _create_inline_process;
+
 }
 
 // ============== Exporting enums, interfaces and types ==============
-export { ProcessesFetchOptions, FetchedProcess, IEnumeratedProcesses, EnumeratedProcessesFilter, TasklistFetchEvents, TasklistHeaders, TasklistProcessDetails } from "./processes/getAllProcesses"
-export { ExecutionResult } from "./processes/killProcess"
+export { ProcessesFetchOptions, FetchedProcess, IEnumeratedProcesses, EnumeratedProcessesFilter, TasklistFetchEvents, TasklistHeaders, TasklistProcessDetails } from "./handlers/getAllProcesses"
+export { ExecutionSignals } from "./handlers/killProcess"
+
+// ============== Exporting classes ==============
+export { InlineProcess } from "./classes/inlineProcess";
 
 export default tasklist;
