@@ -2,10 +2,10 @@ import tasklist, { ProcessesFetchOptions, IEnumeratedProcesses, TasklistProcessD
 
 (async function () {
 
-	const processes: IEnumeratedProcesses = await tasklist.fetchAllProcesses({ verbose: true, timeout: 1000 });
+	const processes: IEnumeratedProcesses = await tasklist.fetchAllProcesses({verbose: true});
 
 	const serviceHosts = tasklist.filterFetchedProcesses(processes, {
-		imageName: "svchost.exe",
+		imageName: "Spotify.exe",
 	});
 
 	console.log(serviceHosts);

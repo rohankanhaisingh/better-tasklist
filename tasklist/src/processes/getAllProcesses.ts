@@ -57,8 +57,6 @@ export type TasklistHeaders = "default" | "verbose";
 
 async function loadTasklist(options: ProcessesFetchOptions, events: TasklistFetchEvents): Promise<string>  {
 
-	console.log(events);
-
 	return new Promise(function (resolve, reject) {
 
 		const taskDetails: TasklistProcessDetails = {
@@ -69,7 +67,7 @@ async function loadTasklist(options: ProcessesFetchOptions, events: TasklistFetc
 			results: null
 		}
 
-		const task = cp.exec(`tasklist /fo csv ${typeof options.verbose === "boolean" ? "/v" : ""}`, function (err: ExecException | null, stdout: string, stderr: string) {
+		const task = cp.exec(`tasklist /fo csv ${options.verbose ? "/v" : ""}`, function (err: ExecException | null, stdout: string, stderr: string) {
 
 			if (err !== null) return reject(err.message);
 
@@ -135,7 +133,7 @@ function getTasklistHeaders(type: TasklistHeaders) {
 
 async function parseOutputContent(input: string, options: ProcessesFetchOptions): Promise<FetchedProcess[]> {
 
-	const tasklistHeaders = getTasklistHeaders(typeof options.verbose === "boolean" ? "verbose" : "default");
+	const tasklistHeaders = getTasklistHeaders(options.verbose ? "verbose" : "default");
 
 	const parser: Parser = parse({ columns: tasklistHeaders});
 
@@ -170,6 +168,7 @@ async function parseOutputContent(input: string, options: ProcessesFetchOptions)
 	return prom;
 }
 
+// Filters 
 function filterObjectByImageName(obj: FetchedProcess, imageName: string | null): boolean {
 
 	const objImageName = obj.imageName;
@@ -181,7 +180,33 @@ function filterObjectByImageName(obj: FetchedProcess, imageName: string | null):
 	return false;
 }
 
+function filterObjectByPID(obj: FetchedProcess, pid: string | number | null): boolean {
 
+	if (typeof pid === "string") {
+
+		if (obj.pid === pid) return true;
+
+	}  
+
+	if (typeof pid === "number") {
+
+		const convertedNumber = parseInt(obj.pid as string);
+
+		
+		if (convertedNumber === pid) return true;
+	}
+
+	return false;
+}
+
+function filterObjectBySessionName(obj: FetchedProcess, sessionName: string | null): boolean {
+
+	if (sessionName === null) return false;
+
+	if (obj.sessionName === sessionName) return <boolean | true> true as boolean;
+
+	return false;
+}
 
 // ============= Public functions =============
 
@@ -205,11 +230,12 @@ export function _filterFetchedProcesses(fetchedProcesses: IEnumeratedProcesses, 
 		const p = fetchedProcesses[i];
 
 		if (filterObjectByImageName(p, typeof filter.imageName === "string" ? filter.imageName : null)) filteredProcesses.push(p);
+		if (filterObjectByPID(p, (typeof filter.pid === "string" || typeof filter.pid === "number") ? filter.pid : null)) filteredProcesses.push(p);
+		if (filterObjectBySessionName(p, typeof filter.sessionName === "string" ? filter.sessionName : null)) filteredProcesses.push(p);
 	}
 	 
 	return filteredProcesses;
 }
-
 /**
  * Fetches all running processes (tasks) and returns an array with the data included. The options are optional.
  * 
@@ -223,21 +249,11 @@ export function _filterFetchedProcesses(fetchedProcesses: IEnumeratedProcesses, 
  * @param options Options when fetching running processes. 
  * @param events Events that can be used before, while and after running the process.
  */
-export async function _fetchProcesses(options?: ProcessesFetchOptions, events?: TasklistFetchEvents): Promise<IEnumeratedProcesses> {
+export async function _fetchProcesses(options: ProcessesFetchOptions | null, events?: TasklistFetchEvents): Promise<IEnumeratedProcesses> {
 
 	const tasklistOutput = await loadTasklist({ ...options }, {...events});
 
 	const parsedProcesses = await parseOutputContent(tasklistOutput, {...options});
 
 	return [...parsedProcesses];
-}
-
-export class _ProcessWrapper {
-	constructor(fetchedProcess: FetchedProcess) {
-
-	}
-	public async KillProcess() {
-
-
-	}
 }

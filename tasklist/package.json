@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
-    "start": "npm run build && node ./lib/test/app.js"
+    "start": "npm run build && node ./dist/test/app.js"
   },
   "devDependencies": {
     "@types/node": "^14.14.7",
