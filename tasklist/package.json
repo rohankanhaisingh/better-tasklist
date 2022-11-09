@@ -1,6 +1,6 @@
 {
   "name": "better-tasklist",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "license": "MIT",
   "repository": "https://github.com/babahgee/better-tasklist",
   "description": "A new wrapper for the Windows `tasklist` command. Gives developers the ability to control running tasks.",
