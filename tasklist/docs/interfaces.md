@@ -1,43 +1,40 @@
 # better-tasklist
 
-A documentation about every existing interface, enums and types.
+A documentation about interface, enums and types used in this library.
 
 ## Interfaces 
 
-### ``ProcessFetchOptions``
-Options that can be used when calling the ``.fetchAllProcesses()`` function.
+### ``FetchingOptions``
+Options that can be used when calling the ``.fetch()`` function.
 
 ```ts
-interface ProcessesFetchOptions {
+interface FetchingOptions {
     timeout?: number; // The amount of time the csv-parser has to parse the tasklist it's output.
     verbose?: boolean; // Will return detailed data, it might take longer than when setting it to false.
 }
 ```
 
-### ``TasklistFetchEvents``
-Events for the fetch process, when calling ``.fetchAllProcesses()``.
+### ``FetchingEvents``
+Events that will be used while fetching.
 
 ```ts
-interface TasklistFetchEvents {
+interface FetchingEvents {
     
-    // Event that will be called when all the data has been fetched, passing an object with the process details.
-    // See interface 'TasklistProcessDetails' for me info.
-    end?: (results: TasklistProcessDetails) => void;
+    // This event is called after successfully fetching Windows processes
+    end?: (results: FetchingDetails) => void;
 
-    // Event that will be called when the tasklist process received data.
-    // The called function comes with two arguments, the buffer and the tasklist process it's details.
-    // See interface 'TasklistProcessDetails' for me info.
-    data?: (buffer: Buffer, details: TasklistProcessDetails) => void;
+    // This event is called as soon as new data is received while retrieving all active and inactive Windows processes
+    data?: (buffer: Buffer, details: FetchingDetails) => void;
 
-    // Event that will be called when an error occurred.
-    error?: (details: TasklistProcessDetails) => void;
+    // Event called when an error has occurred.
+    error?: (details: FetchingDetails) => void;
 }
 ```
 
-### ``TasklistProcessDetails``
+### ``FetchingDetails``
 An object, containing details about the fetching process.
 ```ts
-interface TasklistProcessDetails {
+interface FetchingDetails {
     started: number | null; // Timestamp when the process started.
     ended: number | null; // Timestamp when the process ended.
     receivedBytes: number | null; // Received bytes.
@@ -46,12 +43,12 @@ interface TasklistProcessDetails {
 }
 ```
 
-### ``FetchedProcess``
-An object, containing details about a fetched process. The properties are marked as read-only, they cannot be modified.
+### ``WindowsProcess``
+An object containing all information about the retrieved Windows process. All properties are marked as readonly, so they cannot be edited.
 
 See [``tasklist.exe``](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-xp/bb491010(v=technet.10)) for more info.
 ```ts
-interface FetchedProcess {
+interface WindowsProcess {
     readonly imageName: string;
     readonly pid: string | number;
     readonly sessionName: string;
@@ -64,13 +61,13 @@ interface FetchedProcess {
 }
 ```
 
-### ``EnumeratedProcessesFilter``
-Options that can be use when filtering the enumerated fetched list of processes, giving specific results.
+### ``FilteringKeywords``
+Keywords that can be used to filter all retrieved processes.
 
-This can be used when calling the ``filterFetchedProcesses()`` function.
+This can be used when calling the ``filter()`` function.
 
 ```ts
-interface EnumeratedProcessesFilter {
+interface FilteringKeywords {
     imageName?: string;
     pid?: number | string;
     sessionName?: string;
@@ -85,12 +82,12 @@ interface EnumeratedProcessesFilter {
 
 ## Types
 
-### ``IEnumeratedProcesses``
-The type ``IEnumeratedProcesses`` has been declared as an array with [``FetchedProcess``](#FetchedProcess) objects.
+### ``FetchedWindowsProcesses``
+The type ``FetchedWindwosProcesses`` has been defined as an array with [``WindowsProcess``](#WindowsProcess) objects.
 
-When calling the ``fetchAllProcesses()`` function, or ``filterFetchedProcesses()``, an array with type ``IEnumeratedProcesses`` will be returned.
+When calling the ``fetch()`` function, or ``filter()``, an array (``FetchedWindowsProcesses``) will be returned.
 ```ts
-type IEnumeratedProcesses = FetchedProcess[] | Array<FetchedProcess>;
+type FetchedWindowsProcesses = WindowsProcess[];
 ```
 
 ### ``TasklistHeaders``

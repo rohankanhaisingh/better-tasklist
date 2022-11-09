@@ -52,6 +52,7 @@
     <TypeScriptCompile Include="src\test\test-create_process.ts" />
     <TypeScriptCompile Include="src\test\test-filter_processes.ts" />
     <TypeScriptCompile Include="src\test\test-get_processes.ts" />
+    <TypeScriptCompile Include="src\utils\typings.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <ProjectExtensions>

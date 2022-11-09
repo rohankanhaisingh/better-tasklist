@@ -3,20 +3,10 @@ import cp, { ExecException } from "node:child_process";
 import path from "node:path";
 import url from "node:url";
 import { parse, Parser } from "csv-parse";
-import colors from "colors";
 import { stderr } from "node:process";
 
-colors.enable();
+import { ExecutionSignals } from "../utils/typings";
 
-// =============== Interfaces, types and enums ===============
-
-export enum ExecutionSignals {
-	SUCCEED = 0,
-	ABORTED = 1,
-	ERROR = 2,
-	NOT_FOUND = 3,
-	UNCAUGHT_ERROR = 4
-}
 
 // =============== Private functions ===============
 

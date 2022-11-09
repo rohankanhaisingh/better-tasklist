@@ -1,65 +1,16 @@
-import fs from "node:fs";
 import cp, { ExecException } from "node:child_process";
-import path from "node:path";
-import url from "node:url";
 import { parse, Parser } from "csv-parse";
 
-// ============= Types and interfaces =============
+import { FetchedWindowsProcesses, FetchingDetails, FetchingEvents, FetchingOptions, FilteredWindowsProcesses, FilteringKeywords, TasklistHeaders, WindowsProcess } from "../utils/typings";
 
-export interface ProcessesFetchOptions {
-	timeout?: number;
-	verbose?: boolean;
-}
-
-export interface FetchedProcess {
-	readonly imageName: string;
-	readonly pid: string | number;
-	readonly sessionName: string;
-	readonly sessionNumber: number;
-	readonly memUsage: number;
-	readonly status: string;
-	readonly username: string;
-	readonly cpuTime: string;
-	readonly windowTitle: string;
-}
-
-export interface EnumeratedProcessesFilter {
-	imageName?: string;
-	pid?: number | string;
-	sessionName?: string;
-	sessionNumber?: string | number;
-	memUsage?: string;
-	status?: string;
-	username?: string;
-	cpuTime?: string;
-	windowTitle?: string;
-}
-
-export interface TasklistFetchEvents {
-	end?: (results: TasklistProcessDetails) => void;
-	data?: (buffer: Buffer, details: TasklistProcessDetails) => void;
-	error?: (details: TasklistProcessDetails) => void;
-}
-
-export interface TasklistProcessDetails {
-	started: number | null;
-	ended: number | null;
-	receivedBytes: number | null;
-	results: any;
-	taskPid: string | number | null;
-}
-
-export type IEnumeratedProcesses = Array<FetchedProcess>;
-
-export type TasklistHeaders = "default" | "verbose";
 
 // ============= Private functions =============
 
-async function loadTasklist(options: ProcessesFetchOptions, events: TasklistFetchEvents): Promise<string>  {
+async function loadTasklist(options: FetchingOptions, events: FetchingEvents): Promise<string>  {
 
 	return new Promise(function (resolve, reject) {
 
-		const taskDetails: TasklistProcessDetails = {
+		const taskDetails: FetchingDetails = {
 			started: Date.now(),
 			ended: null,
 			taskPid: null,
@@ -131,19 +82,19 @@ function getTasklistHeaders(type: TasklistHeaders) {
 
 }
 
-async function parseOutputContent(input: string, options: ProcessesFetchOptions): Promise<FetchedProcess[]> {
+async function parseOutputContent(input: string, options: FetchingOptions): Promise<WindowsProcess[]> {
 
 	const tasklistHeaders = getTasklistHeaders(options.verbose ? "verbose" : "default");
 
 	const parser: Parser = parse({ columns: tasklistHeaders, skipRecordsWithError: true});
 
-	const data: FetchedProcess[] = [];
+	const data: WindowsProcess[] = [];
 
-	const prom: Promise<FetchedProcess[]> = new Promise(function (resolve, reject) {
+	const prom: Promise<WindowsProcess[]> = new Promise(function (resolve, reject) {
 
-		parser.on("data", function (chunk: FetchedProcess) {
+		parser.on("data", function (chunk: WindowsProcess) {
 
-			data.push(chunk as FetchedProcess);
+			data.push(chunk as WindowsProcess);
 		});
 
 		parser.on("error", function (err: Error) {
@@ -169,7 +120,7 @@ async function parseOutputContent(input: string, options: ProcessesFetchOptions)
 }
 
 // Filters 
-function filterObjectByImageName(obj: FetchedProcess, imageName: string | null): boolean {
+function filterObjectByImageName(obj: WindowsProcess, imageName: string | null): boolean {
 
 	const objImageName = obj.imageName;
 
@@ -180,7 +131,7 @@ function filterObjectByImageName(obj: FetchedProcess, imageName: string | null):
 	return false;
 }
 
-function filterObjectByPID(obj: FetchedProcess, pid: string | number | null): boolean {
+function filterObjectByPID(obj: WindowsProcess, pid: string | number | null): boolean {
 
 	if (typeof pid === "string") {
 
@@ -199,10 +150,11 @@ function filterObjectByPID(obj: FetchedProcess, pid: string | number | null): bo
 	return false;
 }
 
-function filterObjectBySessionName(obj: FetchedProcess, sessionName: string | null): boolean {
+function filterObjectBySessionName(obj: WindowsProcess, sessionName: string | null): boolean {
 
 	if (sessionName === null) return false;
 
+	// Lmao
 	if (obj.sessionName === sessionName) return <boolean | true> true as boolean;
 
 	return false;
@@ -210,20 +162,24 @@ function filterObjectBySessionName(obj: FetchedProcess, sessionName: string | nu
 
 // ============= Public functions =============
 
+
+
+
+
+
 /**
- * Filters the fetched list of processes, returning specific results to handle with.
- * The filter parameter is required.
+ * Filters retrieved Windows processes based on the given properties.
  * 
  * Example:
- * .filterFetchedProcesses(myFetchedProcesses, { imageName: "svchost.exe" }) => IEnumeratedProcesses<FetchedProcess>;
- * .filterFetchedProcesses(myFetchedProcesses, { pid: 420 | "6969" }) => IEnumeratedProcesses<FetchedProcess>;
+ * .filter(myFetchedProcesses, { imageName: "svchost.exe" }) => FetchedProcess[];
+ * .filter(myFetchedProcesses, { pid: 420 | "6969" }) => FetchedProcess[];
  * 
- * @param fetchedProcesses Array (IEnumeratedProcesses) with fetch proccess to filter.
- * @param filter Filter methods.
+ * @param fetchedProcesses Array (FetchedProcess[]) with fetched Windows proccess to filter.
+ * @param filter Filter keywords.
  */
-export function _filterFetchedProcesses(fetchedProcesses: IEnumeratedProcesses, filter: EnumeratedProcessesFilter): IEnumeratedProcesses {
+export function _filter(fetchedProcesses: FetchedWindowsProcesses, filter: FilteringKeywords): FilteredWindowsProcesses {
 
-	const filteredProcesses: IEnumeratedProcesses = [];
+	const filteredProcesses: FilteredWindowsProcesses = [];
 
 	for (let i = 0; i < fetchedProcesses.length; i++) {
 
@@ -240,16 +196,16 @@ export function _filterFetchedProcesses(fetchedProcesses: IEnumeratedProcesses, 
  * Fetches all running processes (tasks) and returns an array with the data included. The options are optional.
  * 
  * Example:
- * .fetchAllProcesses() => Array<FetchedProcess>;
- * .fetchAllProcesses({ verbose: true }) => Array<[Detailed]FetchedProcess>;
- * .fetchAllProcesses({ timeout: 1000 }) => Array<[Awaited]FetchedProcess>;
- * .fetchAllProcesses(null, {end: myFunction}) => Array<FetchedProcess>;
- * .fetchAllProcesses(null, {data: myFunction}) => Array<FetchedProcess>;
- * .fetchAllProcesses(null, {error: myFunction}) => Array<FetchedProcess>;
- * @param options Options when fetching running processes. 
- * @param events Events that can be used before, while and after running the process.
+ * .fetch() => WindowsProcess[];
+ * .fetch({ verbose: true }) => WindowsProcess[];
+ * .fetch({ timeout: 1000 }) => WindowsProcess[];
+ * .fetch(null, {end: myFunction}) => WindowsProcess[];
+ * .fetchAllProcesses(null, {data: myFunction}) => WindowsProcess[];
+ * .fetch(null, {error: myFunction}) => WindowsProcess[];
+ * @param options Options that can be used while retrieving processes
+ * @param events Events that can be used before, while and after running the retreiving process.
  */
-export async function _fetchProcesses(options: ProcessesFetchOptions | null, events?: TasklistFetchEvents): Promise<IEnumeratedProcesses> {
+export async function _fetch(options: FetchingOptions | null, events?: FetchingEvents): Promise<FetchedWindowsProcesses> {
 
 	const tasklistOutput = await loadTasklist({ ...options }, {...events});
 

@@ -1,4 +1,4 @@
-import tasklist  from "../index";
+import tasklist from "../index";
 
 (async function () {
 

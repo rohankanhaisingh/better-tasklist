@@ -1,10 +1,10 @@
-import tasklist, { IEnumeratedProcesses } from "../index";
+import tasklist, { FetchedWindowsProcesses } from "../index";
 
 (async function () {
 
-	const fetchedProcesses: IEnumeratedProcesses = await tasklist.fetchAllProcesses({ verbose: true });
+	const fetchedProcesses: FetchedWindowsProcesses = await tasklist.fetch({ verbose: true });
 
-	const serviceProcesses = await tasklist.filterFetchedProcesses(fetchedProcesses, {
+	const serviceProcesses = await tasklist.filter(fetchedProcesses, {
 		imageName: "svchost.exe"
 	})
 

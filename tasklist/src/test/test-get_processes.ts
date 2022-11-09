@@ -1,8 +1,8 @@
-import tasklist, { IEnumeratedProcesses } from "../index";
+import tasklist, { FetchedWindowsProcesses } from "../index";
 
 (async function () {
 
-	const processes: IEnumeratedProcesses = await tasklist.fetchAllProcesses({verbose: true});
+	const processes: FetchedWindowsProcesses = await tasklist.fetch({verbose: true});
 
 	console.log(processes);
 
